@@ -10,6 +10,7 @@ const connect = () => {
     .connect(url, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 30000, // 30 seconds (or adjust as needed)
     })
     .then(() => {
       console.log("Connection established");
