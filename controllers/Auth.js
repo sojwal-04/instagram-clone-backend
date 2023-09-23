@@ -83,9 +83,18 @@ const signUp = async (req, res, next) => {
   }
 };
 
-const login = async (req, res, next) => {
+const login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
+
+    console.log("You are logging in ");
+
+    if (!identifier || identifier.trim() === "" || !password || password.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Both username/email and password are required.",
+      });
+    }
 
     let user;
 
@@ -116,7 +125,9 @@ const login = async (req, res, next) => {
       expiresIn: "2h",
     });
 
+    console.log("Above token");
     user.token = token;
+    console.log("user.token = " + user.token);
     user.password = undefined;
 
     const options = {
@@ -129,6 +140,7 @@ const login = async (req, res, next) => {
     return res.cookie("token", token, options).status(200).json({
       success: true,
       message: "User logged in successfully",
+      user: user,
       token: token,
     });
   } catch (err) {

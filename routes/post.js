@@ -4,10 +4,10 @@ import isLoggedIn from "../middlewares/isLoggedIn.js";
 
 const router = express.Router();
 
-router.post("/post", createPost);
+router.post("/post", isLoggedIn, createPost);
 
-// router.get("/", isLoggedIn, fetchPosts);
+router.get("/getPosts", isLoggedIn, fetchPosts);
 
-// router.delete("/delete", isLoggedIn, deletePost);
+router.delete("/delete", isLoggedIn, deletePost);
 
 export default router;

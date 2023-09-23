@@ -18,16 +18,18 @@ const app = express();
 app.use(express.json());
 
 // //middlewares
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Credentials", true);
-//   next();
-// });
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-  })
-);
+const corsOptions = {
+  origin: 'http://localhost:5173', // Replace with your frontend's origin
+  credentials: true, // Allow sending cookies and authentication headers
+};
+
+// Allow requests from a specific origin
+app.use(cors(corsOptions));
 
 app.use(cookieParser());
 
