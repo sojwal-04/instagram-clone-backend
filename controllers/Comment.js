@@ -27,5 +27,4 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
-
-export {postComment, deleteComment}
+export { postComment, deleteComment };

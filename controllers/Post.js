@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
+import Relationship from "../models/Relationship.js";
 
 // Helper functions for fetching posts
 const getPostsForMyProfile = async (userId) => {
@@ -11,13 +12,28 @@ const getPostsForOtherProfile = async (userId) => {
 };
 
 const getPostsForHome = async (userId) => {
-  const following = await Relationship.find({ follower: userId }).select(
-    "following"
-  );
-  const followingIds = following.map((rel) => rel.following);
-  return await Post.find({ user: { $in: followingIds } }).sort({
-    createdAt: -1,
-  });
+  try {
+    // Get the users that the logged-in user follows
+    const following = await Relationship.find({ follower: userId }).select(
+      "following"
+    );
+    const followingIds = following.map((rel) => rel.following);
+
+    // Fetch posts for both the logged-in user and the users they follow
+    const posts = await Post.find({
+      $or: [
+        { user: userId }, // Posts by the logged-in user
+        { user: { $in: followingIds } }, // Posts by users the logged-in user follows
+      ],
+    })
+      .sort({ createdAt: -1 })
+      .populate("user", ["username", "profilePic"]); // Populate user details
+
+    return posts;
+  } catch (error) {
+    console.error("Error fetching posts for home: ", error);
+    throw error;
+  }
 };
 
 //============= Main functions =================
@@ -55,6 +71,7 @@ const createPost = async (req, res, next) => {
 const fetchPosts = async (req, res, next) => {
   try {
     // Validation: Check if at least one valid query parameter is provided.
+    /*
     const { userId } = req.params;
     const { myProfile, otherProfile, home } = req.query;
 
@@ -66,7 +83,7 @@ const fetchPosts = async (req, res, next) => {
     }
 
     let posts;
-
+    
     if (myProfile) {
       posts = await getPostsForMyProfile(req.user._id);
     } else if (otherProfile && userId) {
@@ -74,11 +91,21 @@ const fetchPosts = async (req, res, next) => {
     } else if (home) {
       posts = await getPostsForHome(req.user._id);
     }
+    */
 
-    res.json({ success: true, posts });
+    const userId = req.query.userId;
+    let posts;
+    posts = await getPostsForHome(userId);
+    // posts = await getPostsForMyProfile(userId);
+
+    return res.status(200).json({ success: true, posts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: "Error fetching posts" });
+    res.status(500).json({
+      success: false,
+      message: "Error fetching posts",
+      error: `Error : ${err}`,
+    });
   }
 };
 

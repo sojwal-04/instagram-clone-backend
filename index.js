@@ -8,6 +8,10 @@ import authRoutes from "./routes/auth.js";
 import postRoutes from "./routes/post.js";
 import likeRoutes from "./routes/like.js";
 import commentRoutes from "./routes/comment.js";
+import relationshipRoutes from "./routes/relationship.js";
+import profileRoutes from "./routes/profile.js";
+
+import path from 'path';
 
 dotenv.config();
 connect();
@@ -35,8 +39,17 @@ app.use(cookieParser());
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/posts", postRoutes);
-app.use("/api/v1/like", likeRoutes);
+app.use("/api/v1/likes", likeRoutes);
 app.use("/api/v1/comments", commentRoutes);
+app.use("/api/v1/relationships", relationshipRoutes);
+app.use("/api/v1/profile", profileRoutes);
+
+app.use(express.static(path.join(process.cwd(), 'public')));
+
+// Catch-all route for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
+});
 
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request at ${req.url}`);

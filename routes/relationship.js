@@ -1,11 +1,20 @@
 import express from "express";
-import { follow, unfollow } from "../controllers/Relationship";
-import isLoggedIn from "../middlewares/isLoggedIn";
+import {
+  getRelationship,
+  follow,
+  unfollow,
+} from "../controllers/Relationship.js";
+import isLoggedIn from "../middlewares/isLoggedIn.js";
 
 const router = express.Router();
 
-router.post("/follow", isLoggedIn, follow);
+// router.get('/fetchRelationship', isLoggedIn, getRelationship);
+router.get("/fetchRelationship", getRelationship);
 
-router.delete("/unfollow", isLoggedIn, unfollow);
+// router.post("/follow", isLoggedIn, follow);
+router.post("/follow", follow);
+
+// router.delete("/unfollow", isLoggedIn, unfollow);
+router.delete("/unfollow", unfollow);
 
 export default router;

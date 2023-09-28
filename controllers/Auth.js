@@ -87,9 +87,14 @@ const login = async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
-    console.log("You are logging in ");
+    // console.log("You are logging in ");
 
-    if (!identifier || identifier.trim() === "" || !password || password.trim() === "") {
+    if (
+      !identifier ||
+      identifier.trim() === "" ||
+      !password ||
+      password.trim() === ""
+    ) {
       return res.status(400).json({
         success: false,
         message: "Both username/email and password are required.",
@@ -105,7 +110,7 @@ const login = async (req, res) => {
     }
 
     if (!user) {
-      console.log("User not found");
+      // console.log("User not found");
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -125,9 +130,9 @@ const login = async (req, res) => {
       expiresIn: "2h",
     });
 
-    console.log("Above token");
+    // console.log("Above token");
     user.token = token;
-    console.log("user.token = " + user.token);
+    // console.log("user.token = " + user.token);
     user.password = undefined;
 
     const options = {
