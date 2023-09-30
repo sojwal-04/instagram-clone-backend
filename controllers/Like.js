@@ -1,6 +1,22 @@
 import Like from "../models/Like.js";
 import Post from "../models/Post.js";
 
+const fetchLike = async (req, res) => {
+  try {
+    const { postId, userId } = req.query;
+    const like = await Like.findOne({ post: postId, user: userId });
+
+    return res.status(200).json({ success: true, like: like });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
+};
+
 const likePost = async (req, res) => {
   try {
     const { postIdToLike, likedBy } = req.query;
@@ -12,19 +28,27 @@ const likePost = async (req, res) => {
         .json({ success: false, message: "Post not found" });
     }
 
-    await Like.create({
-      user: likedBy,
-      post: postIdToLike,
-    });
+    const like = await Like.findOne({ post: postIdToLike, user: likedBy });
 
-    return res
-      .status(201)
-      .json({ success: true, message: "Post liked successfully" });
+    if (like) {
+      return res.status(201).json({
+        success: false,
+        message: "Post already liked by the user",
+      });
+    }
+
+    await Like.create({ user: likedBy, post: postIdToLike });
+
+    return res.status(200).json({
+      success: true,
+      message: "Post liked successfully",
+    });
   } catch (err) {
     console.error("Error: " + err.message);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -61,4 +85,4 @@ const unlikePost = async (req, res) => {
   }
 };
 
-export { likePost, unlikePost };
+export { fetchLike, likePost, unlikePost };

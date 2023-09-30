@@ -5,9 +5,10 @@ dotenv.config();
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const isLoggedIn = async (req, res, next) => {
-  
   const token =
     req.cookies.token || req.header["x-access-token"] || req.query.token;
+
+  // console.log("Token: in middleware " + req?.cookies?.token);
 
   if (!token) {
     return res.status(401).json({
@@ -17,7 +18,6 @@ const isLoggedIn = async (req, res, next) => {
   }
 
   try {
-  
     const decoded = jwt.verify(token, secretKey);
     req.userId = token.userId;
 

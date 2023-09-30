@@ -7,7 +7,7 @@ dotenv.config();
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
-const signUp = async (req, res, next) => {
+const signUp = async (req, res) => {
   try {
     const { username, email, password, confirmPassword, name } = req.body;
 
@@ -16,7 +16,7 @@ const signUp = async (req, res, next) => {
     const firstName = names[0];
     const lastName = names[1] ?? "";
 
-    if (!username || !email || !password || !name) {
+    if (!username || !email || !password || !confirmPassword || !name) {
       return res.status(400).json({
         success: false,
         message: "All fields are required",
@@ -33,7 +33,7 @@ const signUp = async (req, res, next) => {
     let existingUser = await User.findOne({ email: email });
 
     if (existingUser) {
-      return res.status(403).json({
+      return res.json({
         success: false,
         message: "User with this email already exists",
       });
@@ -42,7 +42,7 @@ const signUp = async (req, res, next) => {
     existingUser = await User.findOne({ username: username });
 
     if (existingUser) {
-      return res.status(403).json({
+      return res.json({
         success: false,
         message: "User with this username already exists",
       });
@@ -74,7 +74,6 @@ const signUp = async (req, res, next) => {
       token, // Include the token in the response
     });
   } catch (err) {
-    console.error("Error while signing up: " + err);
     return res.status(500).json({
       success: false,
       message: "Error while signing up.",

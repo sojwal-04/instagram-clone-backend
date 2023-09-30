@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
 import Relationship from "../models/Relationship.js";
+import Like from "../models/Like.js";
+import Comment from "../models/Comment.js";
 
 // Helper functions for fetching posts
 const getPostsForMyProfile = async (userId) => {
@@ -11,9 +13,10 @@ const getPostsForOtherProfile = async (userId) => {
   return await Post.find({ user: userId }).sort({ createdAt: -1 });
 };
 
+// /*
 const getPostsForHome = async (userId) => {
   try {
-    // Get the users that the logged-in user follows
+    // Find the users that the logged-in user follows
     const following = await Relationship.find({ follower: userId }).select(
       "following"
     );
@@ -27,7 +30,14 @@ const getPostsForHome = async (userId) => {
       ],
     })
       .sort({ createdAt: -1 })
-      .populate("user", ["username", "profilePic"]); // Populate user details
+      .populate("user", ["username", "profilePic"]) // Populate user details
+      .lean(); 
+
+    // Calculate likesCount and commentsCount for each post
+    for (const post of posts) {
+      post.likesCount = await Like.countDocuments({ post: post._id });
+      post.commentsCount = await Comment.countDocuments({ post: post._id });
+    }
 
     return posts;
   } catch (error) {
@@ -97,6 +107,8 @@ const fetchPosts = async (req, res, next) => {
     let posts;
     posts = await getPostsForHome(userId);
     // posts = await getPostsForMyProfile(userId);
+
+    // console.log(posts);
 
     return res.status(200).json({ success: true, posts });
   } catch (err) {

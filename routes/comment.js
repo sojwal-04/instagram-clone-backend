@@ -4,8 +4,8 @@ import isLoggedIn from "../middlewares/isLoggedIn.js";
 
 const router = express.Router();
 
-router.post("/", isLoggedIn, postComment);
+router.post("/postComment", isLoggedIn, postComment);
 
-router.delete("/", isLoggedIn, deleteComment);
+router.delete("/deleteComment", isLoggedIn, deleteComment);
 
 export default router;
